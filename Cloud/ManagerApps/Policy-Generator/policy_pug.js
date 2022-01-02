@@ -1,16 +1,13 @@
-const pug = require('pug');
-const compiledFunction = pug.compileFile('templates/main.pug');
+const pug = require("pug");
+const compiledFunction = pug.compileFile("templates/main.pug");
 
-function render_tenant_policy(policies){
+function render_tenant_policy(policies) {
     return compiledFunction({
-        policies: policies
-
+        policies: policies,
     });
-
 }
 
-module.exports.render_tenant_policy = render_tenant_policy
-
+module.exports.render_tenant_policy = render_tenant_policy;
 
 // console.log(compiledFunction({
 //     policies: [
@@ -19,7 +16,7 @@ module.exports.render_tenant_policy = render_tenant_policy
 //             "Effect":"Allow",
 //             "Action":[
 //                 "subscribe"
-                
+
 //             ],
 //             "Resource":[
 //                 "/smartcity/traffic/peoplecount/usa/oh/udayton/provider1"
@@ -28,7 +25,7 @@ module.exports.render_tenant_policy = render_tenant_policy
 //         {
 //             "Name":"Allow stream camera in University of Dayton based on curtain constraints",
 //             "Action":[
-//                 "subscribe"                
+//                 "subscribe"
 //             ],
 //             "Effect":"Allow",
 //             "Resource":[
@@ -41,15 +38,15 @@ module.exports.render_tenant_policy = render_tenant_policy
 //                         "context.peoplecount.udayton.avg_15mins": 50
 //                     }
 //                 },
-//                 "All":{    
+//                 "All":{
 //                     "LessThan": {
 //                         "context.tenant.data_amount.lasthour": 100000,
 //                         "context.tenant.data_amount.last24hour": 100000
-//                     }           
-                    
+//                     }
+
 //                 }
 //             }
-            
+
 //         }
 //     ]
 //   }));
