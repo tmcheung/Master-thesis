@@ -6,13 +6,10 @@ import time
 HOGCV = cv2.HOGDescriptor()
 HOGCV.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
-
-
-
 def analyze_video(frame):
     bounding_box_cordinates, weights =  HOGCV.detectMultiScale(frame, winStride = (4, 4), padding = (8, 8), scale = 1.03)
     
-    people_count = 15
+    people_count = 0
     for x,y,w,h in bounding_box_cordinates:
         # cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0), 2)
         # cv2.putText(frame, f'person {people_count}', (x,y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 1)
@@ -54,7 +51,6 @@ def connect_mqtt():
 
 
 connect_mqtt()
-
 while True:
     time.sleep(1)
     try:
