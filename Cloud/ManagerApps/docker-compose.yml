@@ -4,7 +4,6 @@ services:
   api:
     build:
       context: ./Api    
-    restart: always
     expose:
       - "3000"
     ports:

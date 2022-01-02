@@ -16,7 +16,6 @@ services:
   tenant_web:
     build:
       context: ./Tenant-Web
-
     ports:
       - "30000:3000"
     networks:
