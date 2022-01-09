@@ -1,0 +1,9 @@
+version: "2"
+# version: "3.5"
+
+networks:
+    cloud:
+        external: false
+        name: cloud
+    default:
+        external: false
