@@ -12,7 +12,7 @@ class PeopleCountApp extends React.Component {
     }
 
     componentDidMount() {
-        const client = mqtt.connect("ws://192.168.1.156:8888", {
+        const client = mqtt.connect("ws://localhost:8888", {
             username: this.props.username,
             password: this.props.password,
         });

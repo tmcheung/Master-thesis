@@ -1,0 +1,1 @@
+docker-compose -f seed/docker-compose.yml up --build

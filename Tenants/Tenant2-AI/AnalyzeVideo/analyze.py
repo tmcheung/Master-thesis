@@ -43,7 +43,7 @@ def connect_mqtt():
         client = mqtt_client.Client(client_id="123456")
         client.username_pw_set("tenant-2", "123456")
         client.on_connect = on_connect
-        client.connect("192.168.1.156", 1883)
+        client.connect("virtual-mqtt", 1883)
         config.mqtt_client = client
     except Exception as e:
         # print(e)
@@ -54,7 +54,7 @@ connect_mqtt()
 while True:
     time.sleep(1)
     try:
-        video = cv2.VideoCapture('rtmp://192.168.1.156/live/smartcity.camera.stream.usa.ohio.store_x.city_surveillance?username=tenant-2&password=123456')
+        video = cv2.VideoCapture('rtmp://streaming-service/live/smartcity.camera.stream.usa.ohio.store_x.city_surveillance?username=tenant-2&password=123456')
         count = 0
         while video.isOpened():
             count = count +1

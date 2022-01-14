@@ -1,34 +1,39 @@
-version: "3.4"
+version: "3.5"
 
 services:
-  api:
-    build:
-      context: ./Api    
-    expose:
-      - "3000"
-    ports:
-      - "3000:3000"
-    environment:
-      MONGO_URL: ${MONGO_URL}
-      MONGO_DBNAME: ${MONGO_DBNAME}
-    networks:
-      - default
+    api:
+        build:
+            context: ./Api
+        expose:
+            - "3000"
+        ports:
+            - "3000:3000"
+        environment:
+            MONGO_URL: ${MONGO_URL}
+            MONGO_DBNAME: ${MONGO_DBNAME}
+        networks:
+            cloud:
+                aliases:
+                    - auth_api
 
+    policy-generator:
+        build: ./Policy-Generator
+        environment:
+            BOOTSTRAP_KAFKA_HOST: ${BOOTSTRAP_KAFKA_HOST}
+            MONGO_URL: ${MONGO_URL}
+            MONGO_DBNAME: ${MONGO_DBNAME}
+        networks:
+            - cloud
 
-  policy-generator:    
-    build: ./Policy-Generator    
-    environment:
-      BOOTSTRAP_KAFKA_HOST: ${BOOTSTRAP_KAFKA_HOST}
-      MONGO_URL: ${MONGO_URL}
-      MONGO_DBNAME: ${MONGO_DBNAME}
-    networks:
-      - default
+    context-interpretation-worker:
+        build: ./Context-Interpretation-Worker
+        environment:
+            BOOTSTRAP_KAFKA_HOST: ${BOOTSTRAP_KAFKA_HOST}
+            MONGO_URL: ${MONGO_URL}
+            MONGO_DBNAME: ${MONGO_DBNAME}
+        networks:
+            - cloud
 
-  context-interpretation-worker:    
-    build: ./Context-Interpretation-Worker
-    environment:
-      BOOTSTRAP_KAFKA_HOST: ${BOOTSTRAP_KAFKA_HOST}
-      MONGO_URL: ${MONGO_URL}
-      MONGO_DBNAME: ${MONGO_DBNAME}
-    networks:
-      - default
+networks:
+    cloud:
+        external: true

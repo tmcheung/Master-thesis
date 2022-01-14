@@ -1,0 +1,16 @@
+version: "2"
+
+services:
+    datahub-seed:
+        build:
+            context: ./
+            args:
+                - DATABASE_URI=mongodb://mongodb-sharded/datahub
+                - USERNAME=root
+                - PASSWORD=password123
+        networks:
+            - mongodb_cluster
+
+networks:
+    mongodb_cluster:
+        external: true
