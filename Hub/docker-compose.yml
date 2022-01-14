@@ -10,7 +10,8 @@ services:
             - "1935:1935"
             - "8088:8088"
         networks:
-            - default
+            - edgehub_private
+            - edgehub_public
 
     streaming-auth:
         build:
@@ -19,7 +20,8 @@ services:
             OPA_HOST: "http://opa:8181"
             AUTHENTICATION_HOST: ${AUTHENTICATION_HOST}
         networks:
-            - default
+            - edgehub_private
+            - cloud
 
     virtual-mqtt:
         build:
@@ -31,7 +33,6 @@ services:
         environment:
             OPA_HOST: "http://opa:8181"
             AUTHENTICATION_HOST: ${AUTHENTICATION_HOST}
-
         expose:
             - "1883"
             - "8888"
@@ -39,7 +40,9 @@ services:
             - "1883:1883"
             - "8888:8888"
         networks:
-            - default
+            - edgehub_private
+            - edgehub_public
+            - cloud
 
     context-sensing:
         build:
@@ -52,7 +55,8 @@ services:
             API: ${AUTHENTICATION_HOST}
 
         networks:
-            - default
+            - edgehub_private
+            - cloud
 
     policy_synchronizer:
         build:
@@ -61,7 +65,8 @@ services:
             MQTT_HOST: "mqtt://virtual-mqtt:1883"
             BOOTSTRAP_KAFKA_HOST: ${BOOTSTRAP_KAFKA_HOST}
         networks:
-            - default
+            - edgehub_private
+            - cloud
 
     opa_context_sensing:
         build:
@@ -70,14 +75,14 @@ services:
             - "8181:8181"
 
         networks:
-            - default
+            - edgehub_private
 
     opa_mqtt_system:
         build:
             context: ./OPA
 
         networks:
-            - default
+            - edgehub_private
 
     opa_tenant-1:
         build:
@@ -85,7 +90,7 @@ services:
         ports:
             - "18181:8181"
         networks:
-            - default
+            - edgehub_private
 
     opa_tenant-2:
         build:
@@ -93,7 +98,7 @@ services:
         ports:
             - "18182:8181"
         networks:
-            - default
+            - edgehub_private
 
     opa_tenant-3:
         build:
@@ -101,7 +106,7 @@ services:
         ports:
             - "18183:8181"
         networks:
-            - default
+            - edgehub_private
 
     opa_tenant-4:
         build:
@@ -109,4 +114,13 @@ services:
         ports:
             - "18184:8181"
         networks:
-            - default
+            - edgehub_private
+
+networks:
+    edgehub_private:
+        external: false
+    edgehub_public:
+        external: false
+        name: edgehub_public
+    cloud:
+        external: true

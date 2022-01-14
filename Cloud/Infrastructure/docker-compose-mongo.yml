@@ -17,6 +17,8 @@ services:
                 aliases:
                     - mongodb
             mongodb_cluster:
+                aliases:
+                    - mongodb
 
     mongodb-sharded-2:
         image: docker.io/bitnami/mongodb-sharded:4.4
@@ -177,3 +179,4 @@ volumes:
 networks:
     mongodb_cluster:
         external: false
+        name: mongodb_cluster

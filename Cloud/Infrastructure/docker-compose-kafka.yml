@@ -19,6 +19,7 @@ services:
             - kafka
         ports:
             - "9092:9092"
+        tmpfs: "/datalog" # hack to expire brokers, should not be used in production
         volumes:
             - "kafka_data:/bitnami"
         environment:
@@ -29,23 +30,11 @@ services:
         depends_on:
             - zookeeper
 
-    # mongo:
-    #   image: mongo
-    #   restart: always
-    #   ports:
-    #     - "27017:27017"
-    #   volumes:
-    #     - "mongo_data:/data/db"
-    #   environment:
-    #     MONGO_INITDB_ROOT_USERNAME: root
-    #     MONGO_INITDB_ROOT_PASSWORD: root
-
 volumes:
     zookeeper_data:
         driver: local
     kafka_data:
         driver: local
-    # mongo_data: ~
 
 networks:
     kafka:

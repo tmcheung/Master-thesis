@@ -39,7 +39,7 @@ class VideoApp extends React.Component {
         return (
             <ReactHlsPlayer
                 id={this.props.username}
-                src={`http://192.168.1.156:8088/hls/smartcity.camera.stream.usa.ohio.store_x.city_surveillance.m3u8?username=${this.props.username}&password=${this.props.password}`}
+                src={`http://localhost:8088/hls/smartcity.camera.stream.usa.ohio.store_x.city_surveillance.m3u8?username=${this.props.username}&password=${this.props.password}`}
                 autoPlay={true}
                 controls={true}
                 width="550"
