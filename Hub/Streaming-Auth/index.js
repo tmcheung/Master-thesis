@@ -5,11 +5,10 @@ const urljoin = require("url-join");
 
 const fetch = require("node-fetch");
 
-const AUTHENTICATION_HOST =
-    process.env.AUTHENTICATION_HOST || "http://192.168.99.102:3000";
+const AUTHENTICATION_HOST = process.env.AUTHENTICATION_HOST;
 const AUTHENTICATION_URL = urljoin(AUTHENTICATION_HOST, "/login");
 
-const OPA_HOST = process.env.OPA_HOST || "http:/opa:8181";
+const OPA_HOST = process.env.OPA_HOST;
 const OPA_URL = urljoin(OPA_HOST, "v1/data/app/iot");
 
 const app = express();

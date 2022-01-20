@@ -18,12 +18,9 @@ const server = createServer(aedes);
 
 const fetch = require("node-fetch");
 
-const OPA_HOST = process.env.OPA_HOST || "http:/opa:8181";
-const OPA_URL = urljoin(OPA_HOST, "v1/data/app/iot");
-
-const AUTHENTICATION_HOST =
-    process.env.AUTHENTICATION_HOST || "http://192.168.99.101:3000";
+const AUTHENTICATION_HOST = process.env.AUTHENTICATION_HOST;
 const AUTHENTICATION_URL = urljoin(AUTHENTICATION_HOST, "/login");
+const { authorize, authorizationExpired } = require("./auth");
 
 const DATA_AMOUNT_TOPIC = "/hub/data_amount/mqtt";
 const data_amount = {};
@@ -33,32 +30,8 @@ var mqtt_client = mqtt.connect("mqtt://localhost", {
     password: "123456",
 });
 
-async function authorize_subscribe(client, topic, ts) {
-    if (ts - client.authorize_subscribe[topic] > 10000) {
-        topic = topic.replace("#", "99999999999999999999999999999999999");
-        opa_body = {
-            input: {
-                action: "subscribe",
-                tenant_id: client.username,
-                topic: topic,
-            },
-        };
-
-        OPA_TENANT_URL = OPA_URL.replace("opa", `opa_${client.username}`);
-
-        fetch(OPA_TENANT_URL, {
-            method: "POST",
-            body: JSON.stringify(opa_body),
-        })
-            .then((res) => res.json()) // expecting a json response
-            .then((json) => {
-                if (json["result"]["allow"]) {
-                    client.authorize_subscribe[topic] = ts;
-                } else {
-                    client.authorize_subscribe[topic] = 0;
-                }
-            });
-    }
+function removeTopicWildcard(topic) {
+    return topic.replace("#", "99999999999999999999999999999999999");
 }
 
 aedes.authenticate = function (client, username, password, callback) {
@@ -83,8 +56,10 @@ aedes.authenticate = function (client, username, password, callback) {
         .then((json) => {
             if (json["status"]) {
                 console.log("User %s is authenticated", username);
+                if (!(username in data_amount)) {
+                    data_amount[username] = 0;
+                }
 
-                data_amount[username] = 0;
                 callback(null, true);
             } else {
                 console.log("User %s is NOT authenticated", username);
@@ -96,104 +71,85 @@ aedes.authenticate = function (client, username, password, callback) {
         });
 };
 
-aedes.authorizeSubscribe = function (client, sub, callback) {
-    topic = sub.topic.replace("#", "99999999999999999999999999999999999");
+aedes.authorizePublish = function (client, packet, callback) {
+    const user = client.username;
+    const topic = packet.topic;
+    const action = `publish`;
 
-    opa_body = {
-        input: {
-            action: "subscribe",
-            tenant_id: client.username,
-            topic: topic,
-        },
-    };
-
-    if (client.authorize_subscribe == undefined) {
-        client.authorize_subscribe = {};
+    if (!authorizationExpired(client, topic, action, 10000)) {
+        data_amount[user] = data_amount[user] + sizeof.sizeof(packet);
+        console.log(`client ${user} is authorized to publish to ${topic}`);
+        callback(null);
+        return;
     }
 
-    OPA_TENANT_URL = OPA_URL.replace("opa", `opa_${client.username}`);
-
-    console.log(OPA_TENANT_URL);
-
-    const ts = Date.now();
-    fetch(OPA_TENANT_URL, { method: "POST", body: JSON.stringify(opa_body) })
-        .then((res) => res.json()) // expecting a json response
-        .then((json) => {
-            if (json["result"]["allow"]) {
-                client.authorize_subscribe[sub.topic] = ts;
-                callback(null, sub);
-            } else {
-                console.log(
-                    "Tenant %s is not authorized to subscribe to %s",
-                    client.username,
-                    sub.topic
-                );
-                callback(new Error("Unauthorized"));
-
-                client.authorize_subscribe[sub.topic] = 0;
-            }
-        });
+    authorize(client, topic, action).then((isAuthorized) => {
+        if (isAuthorized) {
+            data_amount[user] = data_amount[user] + sizeof.sizeof(packet);
+            console.log(`client ${user} is authorized to publish to ${topic}`);
+            callback(null);
+        } else {
+            console.log(
+                "Tenant %s is not authorized to publish to %s",
+                user,
+                topic
+            );
+            callback(new Error("Unauthorized"));
+        }
+    });
 };
 
-aedes.authorizePublish = function (client, packet, callback) {
-    if (client.authorize_publish == undefined) {
-        client.authorize_publish = {};
+aedes.authorizeSubscribe = function (client, sub, callback) {
+    const topic = removeTopicWildcard(sub.topic);
+    const action = `subscribe`;
+
+    if (!authorizationExpired(client, topic, action, 30000)) {
+        console.log("Tenant %s subscribed to %s", client.username, sub.topic);
+        callback(null, sub);
+        return;
     }
 
-    if (client.authorize_publish[packet.topic] == undefined) {
-        client.authorize_publish[packet.topic] = 0;
-    }
-
-    const ts = Date.now();
-
-    if (ts - client.authorize_publish[packet.topic] < 10000) {
-        callback(null);
-    } else {
-        opa_body = {
-            input: {
-                action: "publish",
-                tenant_id: client.username,
-                topic: packet.topic,
-            },
-        };
-
-        OPA_TENANT_URL = OPA_URL.replace("opa", `opa_${client.username}`);
-
-        fetch(OPA_TENANT_URL, {
-            method: "POST",
-            body: JSON.stringify(opa_body),
-        })
-            .then((res) => res.json()) // expecting a json response
-            .then((json) => {
-                if (json["result"]["allow"]) {
-                    data_amount[client.username] =
-                        data_amount[client.username] + sizeof.sizeof(packet);
-
-                    client.authorize_publish[packet.topic] = ts;
-                    callback(null);
-                } else {
-                    console.log(
-                        "Tenant %s is not authorized to publish to %s",
-                        client.username,
-                        packet.topic
-                    );
-                    callback(new Error("Unauthorized"));
-                }
-            });
-    }
+    authorize(client, topic, action).then((isAuthorized) => {
+        if (isAuthorized) {
+            console.log(
+                "Tenant %s subscribed to %s",
+                client.username,
+                sub.topic
+            );
+            callback(null, sub);
+        } else {
+            console.log(
+                "Tenant %s is not authorized to subscribe to %s",
+                client.username,
+                sub.topic
+            );
+            callback(new Error("Unauthorized"));
+        }
+    });
 };
 
 aedes.authorizeForward = function (client, packet) {
-    const ts = Date.now();
+    const username = client.username;
+    const topic = removeTopicWildcard(packet.topic);
+    const action = `subscribe`;
 
-    authorize_subscribe(client, packet.topic, ts);
+    if (authorizationExpired(client, topic, action, 10000)) {
+        authorize(client, topic, action);
+    }
 
-    if (ts - client.authorize_subscribe[packet.topic] < 10000) {
-        data_amount[client.username] =
-            data_amount[client.username] + sizeof.sizeof(packet);
-        return packet;
+    if (authorizationExpired(client, topic, action, 30000)) {
+        console.log(
+            `Client ${username} is not authorized to receive packet ${JSON.stringify(
+                packet
+            )}`
+        );
+        return null;
     } else {
-        return;
+        data_amount[username] = data_amount[username] + sizeof.sizeof(packet);
+        console.log(
+            `Forwarding packet ${JSON.stringify(packet)} to client ${username} `
+        );
+        return packet;
     }
 };
 
@@ -207,10 +163,21 @@ httpServer.listen(http_port, function () {
 
 setInterval(() => {
     for (const [tenant_id, value] of Object.entries(data_amount)) {
-        topic = `${DATA_AMOUNT_TOPIC}/${tenant_id}`;
+        const topic = `${DATA_AMOUNT_TOPIC}/${tenant_id}`;
 
-        console.log(topic);
+        console.log(
+            `Publishing: ${data_amount[tenant_id]}, on topic: ${topic}`
+        );
+
+        aedes.publish({
+            cmd: "publish",
+            qos: 2,
+            topic: topic,
+            payload: Buffer.from(`${data_amount[tenant_id]}`),
+            retain: false,
+        });
         mqtt_client.publish(topic, `${data_amount[tenant_id]}`);
+
         data_amount[tenant_id] = 0;
     }
 }, 6000);

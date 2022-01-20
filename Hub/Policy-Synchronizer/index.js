@@ -100,11 +100,10 @@ consumer.run({
             console.log(topic);
         }
 
-        // console.log(message.value.toString())
-
         message_parsed = JSON.parse(message.value.toString());
-
-        // console.log(message_parsed)
+        if (!message_parsed["tenant_id"]) {
+            return;
+        }
 
         if (topic.startsWith(TENANT_POLICY_TOPIC)) {
             const ts = Date.now();

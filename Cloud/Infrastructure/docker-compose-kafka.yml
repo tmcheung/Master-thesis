@@ -3,6 +3,7 @@
 services:
     zookeeper:
         image: docker.io/bitnami/zookeeper:3.7
+        restart: unless-stopped
         networks:
             - kafka
         ports:
@@ -14,12 +15,12 @@ services:
 
     kafka:
         image: docker.io/bitnami/kafka:3
+        restart: unless-stopped
         networks:
             - cloud
             - kafka
         ports:
             - "9092:9092"
-        tmpfs: "/datalog" # hack to expire brokers, should not be used in production
         volumes:
             - "kafka_data:/bitnami"
         environment:

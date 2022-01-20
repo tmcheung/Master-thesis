@@ -17,7 +17,7 @@ services:
         build:
             context: ./Streaming-Auth
         environment:
-            OPA_HOST: "http://opa:8181"
+            OPA_HOST: ${OPA_HOST}
             AUTHENTICATION_HOST: ${AUTHENTICATION_HOST}
         networks:
             - edgehub_private
@@ -31,7 +31,7 @@ services:
             - opa_tenant-2
             - opa_context_sensing
         environment:
-            OPA_HOST: "http://opa:8181"
+            OPA_HOST: ${OPA_HOST}
             AUTHENTICATION_HOST: ${AUTHENTICATION_HOST}
         expose:
             - "1883"
@@ -50,7 +50,7 @@ services:
         depends_on:
             - virtual-mqtt
         environment:
-            MQTT_HOST: "mqtt://virtual-mqtt:1883"
+            MQTT_HOST: ${MQTT_HOST}
             BOOTSTRAP_KAFKA_HOST: ${BOOTSTRAP_KAFKA_HOST}
             API: ${AUTHENTICATION_HOST}
 
@@ -62,7 +62,7 @@ services:
         build:
             context: ./Policy-Synchronizer
         environment:
-            MQTT_HOST: "mqtt://virtual-mqtt:1883"
+            MQTT_HOST: ${MQTT_HOST}
             BOOTSTRAP_KAFKA_HOST: ${BOOTSTRAP_KAFKA_HOST}
         networks:
             - edgehub_private
@@ -73,14 +73,14 @@ services:
             context: ./OPA
         ports:
             - "8181:8181"
-
         networks:
             - edgehub_private
 
     opa_mqtt_system:
         build:
             context: ./OPA
-
+        ports:
+            - "8182:8181"
         networks:
             - edgehub_private
 

@@ -2,9 +2,8 @@ const { Kafka } = require("kafkajs");
 const MongoClient = require("mongodb").MongoClient;
 const crypto = require("crypto");
 
-const BOOTSTRAP_KAFKA_HOST =
-    process.env.BOOTSTRAP_KAFKA_HOST || "192.168.1.156:9092";
-const MONGO_URL = process.env.MONGO_URL || "mongodb://root:root@192.168.1.156";
+const BOOTSTRAP_KAFKA_HOST = process.env.BOOTSTRAP_KAFKA_HOST;
+const MONGO_URL = process.env.MONGO_URL;
 const MONGO_DBNAME = process.env.MONGO_DBNAME || "datahub";
 
 const CONTEXT_DATA_TOPIC = ".context_data";
@@ -101,7 +100,11 @@ function evaluate_tenant_contexts(updated_context) {
     console.log("--------------------");
 
     const ts = Date.now();
-    console.log(`Context Change TS: ${ts}`);
+    console.log(
+        `Context Change, Timestamp: ${ts},
+        tenantcontext: ${JSON.stringify(tenant_context, null, 4)},
+        context: ${JSON.stringify(updated_context, null, 4)}`
+    );
 
     Object.keys(tenant_context).forEach(function (tenant_id) {
         evaluate_tenant_context(tenant_id, updated_context);
@@ -217,7 +220,7 @@ function evaluate_tenant_context(tenant_id, updated_context) {
         }
     });
 
-    if (push_context) {
+    if (push_context || true) {
         const ts = Date.now();
         console.log(`[${tenant_id}], PUSH Context Change TS: ${ts}`);
 

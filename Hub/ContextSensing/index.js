@@ -4,10 +4,9 @@ const { DataFrame } = require("dataframe-js");
 const fetch = require("node-fetch");
 const urljoin = require("url-join");
 
-const MQTT_HOST = process.env.MQTT_HOST || "mqtt://192.168.1.156:1883";
-const BOOTSTRAP_KAFKA_HOST =
-    process.env.BOOTSTRAP_KAFKA_HOST || "192.168.1.156:9092";
-const API = process.env.API || "http://192.168.1.156:3000";
+const MQTT_HOST = process.env.MQTT_HOST;
+const BOOTSTRAP_KAFKA_HOST = process.env.BOOTSTRAP_KAFKA_HOST;
+const API = process.env.API;
 
 const API_MAPPING_URL = urljoin(API, "/mapping");
 
@@ -42,22 +41,47 @@ client.on("connect", () => {
                 if (type != "_id") {
                     for (const [sub1, conf] of Object.entries(mapping[type])) {
                         const topic = conf["topic"];
-                        client.subscribe(topic, function (err) {
-                            console.log(`Succesfully subscribing ${topic}`);
+                        client.subscribe(topic, null, function (err, granted) {
+                            if (err) {
+                                console.log(
+                                    `Error when subscribing to ${topic}: ${JSON.stringify(
+                                        err
+                                    )}`
+                                );
+                            } else {
+                                console.log(
+                                    `Succesfully subscribing to ${topic}: ${JSON.stringify(
+                                        granted
+                                    )}`
+                                );
+                            }
                         });
                     }
                 }
             }
         });
 
-    // client.subscribe('/hub/data_amount/mqtt/tenant1', function (err) {
-    //     console.log("Succesfully subscribing")
-    // })
+    // const test_topic = `/hub/data_amount/mqtt/mqtt_system`;
+    // client.subscribe(test_topic, function (err, granted) {
+    //     if (err) {
+    //         console.log(
+    //             `Error when subscribing to ${test_topic}: ${JSON.stringify(
+    //                 err
+    //             )}`
+    //         );
+    //     } else {
+    //         console.log(
+    //             `Succesfully subscribing to ${test_topic}: ${JSON.stringify(
+    //                 granted
+    //             )}`
+    //         );
+    //     }
+    // });
 });
 
 client.on("message", function (topic, message) {
     // message is Buffer
-    // console.log(message.toString())
+    console.log(`Received message: ${message.toString()}, on topic: ${topic}`);
 
     if (!(topic in data)) {
         const df = new DataFrame([], ["Timestamp", "data"]);
@@ -73,7 +97,7 @@ function process_people_count() {
     for (const [location, value] of Object.entries(mapping["people_count"])) {
         const topic = value["topic"];
 
-        if (data[topic] == undefined) {
+        if (!(topic in data)) {
             continue;
         }
 
@@ -115,7 +139,7 @@ function process_people_count() {
 }
 
 function process_data_amount() {
-    console.log("process_data_amount");
+    console.log(`process_data_amount: ${JSON.stringify(data, null, 4)}`);
 
     const last_hour = Date.now() - 60 * 60 * 1000;
     const last_24hour = Date.now() - 24 * 60 * 60 * 1000;
@@ -191,6 +215,19 @@ function process_data_amount() {
 }
 
 setInterval(function () {
-    process_people_count();
-    process_data_amount();
+    try {
+        process_people_count();
+    } catch (err) {
+        console.error(
+            `exception thrown when attempting to process people count: ${err}`
+        );
+    }
+
+    try {
+        process_data_amount();
+    } catch (err) {
+        console.error(
+            `exception thrown when attempting to process data amount: ${err}`
+        );
+    }
 }, 5000);
