@@ -118,7 +118,7 @@ consumer.run({
         } else if (topic.startsWith(TENANT_CONTEXT_DATA_TOPIC)) {
             const ts = Date.now();
             console.log(
-                `[${message_parsed["tenant_id"]}], Context Data Updated TS: ${ts}`
+                `[${message_parsed["tenant_id"]}], Context Data Updated TS: ${ts}, Message: ${message_parsed["context_data"]}`
             );
 
             update_context_data(

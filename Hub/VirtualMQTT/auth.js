@@ -36,10 +36,6 @@ function authorizationExpired(client, topic, action, expirationThreshold) {
 }
 
 async function authorize(client, topic, action) {
-    if (authorizationNotExpired(client, topic, action, 10000)) {
-        return true;
-    }
-
     const user = client.username;
     opa_body = {
         input: {

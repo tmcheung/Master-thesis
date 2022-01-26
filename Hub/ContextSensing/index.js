@@ -129,7 +129,7 @@ function process_people_count() {
                 .stat.mean("data"),
         };
 
-        console.log(context_data);
+        console.log(JSON.stringify(context_data, null, 4));
 
         producer.send({
             topic: kafka_context_sensing_topic,
@@ -139,7 +139,8 @@ function process_people_count() {
 }
 
 function process_data_amount() {
-    console.log(`process_data_amount: ${JSON.stringify(data, null, 4)}`);
+    // console.log(`process_data_amount: ${JSON.stringify(data, null, 4)}`);
+    console.log(`process_data_amount`);
 
     const last_hour = Date.now() - 60 * 60 * 1000;
     const last_24hour = Date.now() - 24 * 60 * 60 * 1000;
@@ -169,7 +170,7 @@ function process_data_amount() {
         }
     }
 
-    console.log(context_data);
+    console.log(JSON.stringify(context_data, null, 4));
     producer.send({
         topic: kafka_context_sensing_topic,
         messages: [{ value: JSON.stringify(context_data) }],
