@@ -1,7 +1,11 @@
 version: "3.5"
 services:
-  PersonCount:
-    build:
-      context: ./PersonCount
-    networks:
-      - default
+    person_count:
+        build:
+            context: ./PersonCount
+        networks:
+            - edgehub_public
+
+networks:
+    edgehub_public:
+        external: true

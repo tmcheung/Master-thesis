@@ -10,6 +10,5 @@ for d in $SCRIPT_DIR/*; do
         continue
     fi
 
-    docker-compose -f $COMPOSE_FILE up --build -d
-    docker-compose -f $COMPOSE_FILE ps
+    docker-compose -f $COMPOSE_FILE down
 done
