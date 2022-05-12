@@ -108,25 +108,20 @@ function process_people_count() {
             people_count: {},
         };
 
+        let offsetData5Min = data[topic].filter(
+            (row) => row.get("Timestamp") > last_5mins
+        );
+        let offsetData15Min = data[topic].filter(
+            (row) => row.get("Timestamp") > last_15mins
+        );
+
         context_data["people_count"][location] = {
-            max_5mins: data[topic]
-                .filter((row) => row.get("Timestamp") > last_5mins)
-                .stat.max("data"),
-            min_5mins: data[topic]
-                .filter((row) => row.get("Timestamp") > last_5mins)
-                .stat.min("data"),
-            avg_5mins: data[topic]
-                .filter((row) => row.get("Timestamp") > last_5mins)
-                .stat.mean("data"),
-            max_15mins: data[topic]
-                .filter((row) => row.get("Timestamp") > last_15mins)
-                .stat.max("data"),
-            min_15mins: data[topic]
-                .filter((row) => row.get("Timestamp") > last_15mins)
-                .stat.min("data"),
-            avg_15mins: data[topic]
-                .filter((row) => row.get("Timestamp") > last_15mins)
-                .stat.mean("data"),
+            max_5mins: offsetData5Min.stat.max("data"),
+            min_5mins: offsetData5Min.stat.min("data"),
+            avg_5mins: offsetData5Min.stat.mean("data"),
+            max_15mins: offsetData15Min.stat.max("data"),
+            min_15mins: offsetData15Min.stat.min("data"),
+            avg_15mins: offsetData15Min.stat.mean("data"),
         };
 
         console.log(JSON.stringify(context_data, null, 4));
