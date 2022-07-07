@@ -1,6 +1,6 @@
 SCRIPT_DIR=$(dirname "$0")
 
-for d in $SCRIPT_DIR/*; do
+for d in $SCRIPT_DIR/Apps/*; do
     if ! [ -d "$d" ]; then
         continue
     fi
