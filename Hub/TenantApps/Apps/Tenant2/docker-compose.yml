@@ -9,3 +9,5 @@ services:
 networks:
     edgehub_public:
         external: true
+    proxy_network:
+        external: true

@@ -1,0 +1,31 @@
+version: "3.5"
+services:
+  forward_proxy:
+    image: nginx
+    container_name: forward_proxy
+    volumes:
+      - ./nginx_opa_forward_proxy.conf:/etc/nginx/nginx.conf:ro
+      - ./auth_request.js:/etc/nginx/njs/auth_request.js:ro
+      - ./nginx_logs:/var/log/nginx
+    expose:
+      - "80"
+    ports:
+      - 89:80
+      - 443:443
+    networks:
+      - edgehub_private
+      - cloud
+      - proxy_network
+
+
+networks:
+  edgehub_private:
+      external: true
+  cloud:
+      external: true
+  proxy_network:
+      external: false
+      internal: true
+      name: proxy_network
+      driver: bridge
+
