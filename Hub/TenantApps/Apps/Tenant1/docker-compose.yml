@@ -1,8 +1,8 @@
 version: "3.5"
 services:
-    person_count:
+    test_container:
         build:
-            context: ./PersonCount
+            context: ./test
         networks:
             - edgehub_public
             - proxy_network
