@@ -6,6 +6,12 @@ services:
         networks:
             - edgehub_tenant_apps
             - proxy_network
+    test_container:
+        build:
+            context: ./test
+        networks:
+            - edgehub_tenant_apps
+            - proxy_network
 
 networks:
     edgehub_tenant_apps:
