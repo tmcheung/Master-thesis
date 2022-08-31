@@ -2,6 +2,8 @@ const authorizeRequest = async (r) => {
     const credentials = getBasicAuthCredentials(r);
     const method = getMethod(r);
     const url = getUrl(r);
+    r.error(JSON.stringify(r));
+    r.error(`${credentials.username}, ${credentials.password}`);
 
     if (
         !credentials ||
@@ -19,16 +21,19 @@ const authorizeRequest = async (r) => {
 };
 
 const authenticated = async (r, username, password) => {
+    r.error(`credentials: ${username}, ${password} `);
     const response = await r.subrequest("/_authenticate", {
         method: "POST",
         body: JSON.stringify({ username, password }),
     });
+    r.error(JSON.stringify(response));
     const json = JSON.parse(response.responseText);
+    r.error(JSON.stringify(json));
+
     return json && json.status;
 };
 
 const authorized = async (r, username, method, url) => {
-    r.error(`/opa_${username}`);
     const response = await r.subrequest(`/opa_${username}`, {
         method: "POST",
         body: JSON.stringify({

@@ -36,16 +36,15 @@ app.get("/mapping", (req, res) => {
 });
 
 app.post("/login", function (req, res) {
-    // response_body={
-    //   "status": true
-    // }
 
-    // res.send(JSON.stringify(response_body))
-    // return
+    console.log("stringified header: " + JSON.stringify(req.headers))
+    console.log("stringified ip: " + JSON.stringify(req.ip))
+    console.log("stringified hostname: " + JSON.stringify(req.hostname))
+    console.log("stringified body: " + JSON.stringify(req.body))
+    let username = req.body["username"];
+    let password = req.body["password"];
 
-    const username = req.body["username"];
-    const password = req.body["password"];
-
+    console.log(`credentials: ${username}, ${password}`)
     MongoClient.connect(
         MONGO_URL,
         { useUnifiedTopology: true },
@@ -67,6 +66,11 @@ app.post("/login", function (req, res) {
                     ) {
                         status = true;
                     }
+                    if(result != null) console.log(`passwords: ${password}, ${result.password}`)
+                    else console.log(`RESULT NULL`)
+                    
+                    console.log("status: " + status)
+                    console.log(`_________________________________________`)
 
                     response_body = {
                         status: status,

@@ -35,6 +35,12 @@
             "Resource": [
                 "/smartcity/camera/stream/usa/ohio/stubpark/city_surveillance"
             ]
+        },
+        {
+            "Name": "Allow GET request to http://httpbin.org/get",
+            "Effect": "Allow",
+            "Action": ["GET"],
+            "Resource": ["http://httpbin.org/get"]
         }
     ],
 

@@ -12,6 +12,7 @@ services:
         networks:
             - edgehub_private
             - edgehub_public
+            - edgehub_tenant_apps
 
     streaming-auth:
         build:
@@ -42,6 +43,7 @@ services:
         networks:
             - edgehub_private
             - edgehub_public
+            - edgehub_tenant_apps
             - cloud
 
     context-sensing:
@@ -119,8 +121,12 @@ services:
 networks:
     edgehub_private:
         external: false
+        name: edgehub_private
     edgehub_public:
         external: false
         name: edgehub_public
+    edgehub_tenant_apps:
+        external: false
+        name: edgehub_tenant_apps
     cloud:
         external: true

@@ -53,6 +53,8 @@ def connect_mqtt():
 connect_mqtt()
 while True:
     time.sleep(1)
+    print("requesting video feed")
+
     try:
         video = cv2.VideoCapture('rtmp://streaming-service/live/smartcity.camera.stream.usa.ohio.store_x.city_surveillance?username=tenant-2&password=123456')
         count = 0
