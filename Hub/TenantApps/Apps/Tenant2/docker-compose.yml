@@ -6,12 +6,28 @@ services:
         networks:
             - edgehub_tenant_apps
             - proxy_network
-    test_container:
+        deploy: 
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 50M
+                reservations:
+                    cpus: '0.25'
+                    memory: 20M
+    http_test:
         build:
-            context: ./test
+            context: ./HttpTest
         networks:
             - edgehub_tenant_apps
             - proxy_network
+        deploy: 
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 50M
+                reservations:
+                    cpus: '0.25'
+                    memory: 20M
 
 networks:
     edgehub_tenant_apps:
