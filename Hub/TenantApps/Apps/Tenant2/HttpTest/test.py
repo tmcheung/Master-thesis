@@ -8,10 +8,9 @@ while True:
     try:
 
         print("requesting")
-
         proxies = {
-        'http': 'http://forward_proxy:80',
-        'https': 'http://forward_proxy:443',
+            'http': 'http://forward_proxy:80',
+            'https': 'http://forward_proxy:443',
         }
         headers = {
             'Proxy-Authorization': 'tenant-2:123456',
@@ -22,10 +21,6 @@ while True:
             proxies=proxies,
             headers=headers
         )
-
-        # r = requests.get(
-        #     'http://httpbin.org/get'
-        # )
 
         print(r.status_code)
     except Exception as e:

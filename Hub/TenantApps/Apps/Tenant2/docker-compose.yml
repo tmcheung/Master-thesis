@@ -6,6 +6,7 @@ services:
         networks:
             - edgehub_tenant_apps
             - proxy_network
+            - edgehub_public
         deploy: 
             resources:
                 limits:
@@ -33,4 +34,6 @@ networks:
     edgehub_tenant_apps:
         external: true
     proxy_network:
+        external: true
+    edgehub_public:
         external: true

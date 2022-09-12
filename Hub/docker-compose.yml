@@ -119,6 +119,8 @@ services:
             - edgehub_private
 
 networks:
+    cloud:
+        external: true
     edgehub_private:
         external: false
         name: edgehub_private
@@ -127,6 +129,12 @@ networks:
         name: edgehub_public
     edgehub_tenant_apps:
         external: false
+        internal: true
+        driver: bridge
         name: edgehub_tenant_apps
-    cloud:
-        external: true
+    proxy_network:
+        external: false
+        internal: true
+        name: proxy_network
+        driver: bridge
+

@@ -46,7 +46,7 @@ def connect_mqtt():
         client.connect("virtual-mqtt", 1883)
         config.mqtt_client = client
     except Exception as e:
-        # print(e)
+        print(e)
         pass
 
 
