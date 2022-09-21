@@ -25,4 +25,7 @@ networks:
   cloud:
       external: true
   proxy_network:
-      external: true
+      external: false
+      internal: true
+      name: proxy_network
+      driver: bridge

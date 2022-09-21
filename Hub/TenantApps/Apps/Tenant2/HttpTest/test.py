@@ -4,7 +4,7 @@ import time
 print("starting up")
 
 while True:
-    time.sleep(10)
+    time.sleep(15)
     try:
 
         print("requesting")
@@ -19,9 +19,10 @@ while True:
         r = requests.put(
             'http://httpbin.org/put',
             proxies=proxies,
-            headers=headers
+            headers=headers,
         )
 
         print(r.status_code)
+
     except Exception as e:
         print("Exception:", e)

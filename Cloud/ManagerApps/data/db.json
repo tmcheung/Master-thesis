@@ -37,6 +37,14 @@
             ]
         },
         {
+            "Name": "Allow Tenant-1 of Kitchen Surveillance to publish to the stream",
+            "Effect": "Allow",
+            "Action": ["publish"],
+            "Resource": [
+                "/smartcity/camera/stream/usa/ohio/stubpark/city_surveillance"
+            ]
+        },
+        {
             "Name": "Allow GET request to http://httpbin.org/get",
             "Effect": "Allow",
             "Action": ["GET"],

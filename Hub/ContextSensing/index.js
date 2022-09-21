@@ -133,6 +133,48 @@ function process_people_count() {
     }
 }
 
+function process_fire_detected() {
+    console.log("process_fire_detected");
+
+    for (const [location, value] of Object.entries(mapping["fire_detected"])) {
+        const topic = value["topic"];
+
+        if (!(topic in data)) {
+            continue;
+        }
+
+        const last_5mins = Date.now() - 5 * 60 * 1000;
+        const last_15mins = Date.now() - 15 * 60 * 1000;
+
+        context_data = {
+            fire_detected: {},
+        };
+
+        let offsetData5Min = data[topic].filter(
+            (row) => row.get("Timestamp") > last_5mins
+        );
+        let offsetData15Min = data[topic].filter(
+            (row) => row.get("Timestamp") > last_15mins
+        );
+
+        context_data["fire_detected"][location] = {
+            max_5mins: offsetData5Min.stat.max("data"),
+            min_5mins: offsetData5Min.stat.min("data"),
+            avg_5mins: offsetData5Min.stat.mean("data"),
+            max_15mins: offsetData15Min.stat.max("data"),
+            min_15mins: offsetData15Min.stat.min("data"),
+            avg_15mins: offsetData15Min.stat.mean("data"),
+        };
+
+        console.log(JSON.stringify(context_data, null, 4));
+
+        producer.send({
+            topic: kafka_context_sensing_topic,
+            messages: [{ value: JSON.stringify(context_data) }],
+        });
+    }
+}
+
 function process_data_amount() {
     // console.log(`process_data_amount: ${JSON.stringify(data, null, 4)}`);
     console.log(`process_data_amount`);
@@ -216,6 +258,14 @@ setInterval(function () {
     } catch (err) {
         console.error(
             `exception thrown when attempting to process people count: ${err}`
+        );
+    }
+
+    try {
+        process_fire_detected();
+    } catch (err) {
+        console.error(
+            `exception thrown when attempting to process fire_detected: ${err}`
         );
     }
 

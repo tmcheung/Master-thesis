@@ -12,6 +12,14 @@
                 "Resource": [
                     "/smartcity/camera/stream/usa/ohio/store_x/city_surveillance"
                 ]
+            },
+            {
+                "Name": "Allow Tenant-1 of Kitchen Surveillance to publish to the stream",
+                "Effect": "Allow",
+                "Action": ["publish"],
+                "Resource": [
+                    "/smartcity/camera/stream/usa/ohio/kitchen_x/city_surveillance"
+                ]
             }
         ]
     },
@@ -31,12 +39,6 @@
                 ]
             },
             {
-                "Name": "Allow PUT request to http://httpbin.org/put",
-                "Effect": "Allow",
-                "Action": ["PUT"],
-                "Resource": ["http://httpbin.org/put"]
-            },
-            {
                 "Name": "Allow City AI to publish the people count",
                 "Action": ["publish"],
                 "Effect": "Allow",
@@ -51,6 +53,63 @@
                 "Resource": [
                     "/smartcity/camera/people_count/usa/ohio/store_x/city_ai"
                 ]
+            },
+            {
+                "Name": "Allow Kitchen AI to subscribe the Video",
+                "Effect": "Allow",
+                "Action": ["subscribe"],
+                "Resource": [
+                    "/smartcity/camera/stream/usa/ohio/kitchen_x/city_surveillance"
+                ]
+            },
+            {
+                "Name": "Allow Kitchen AI to publish the people count",
+                "Action": ["publish"],
+                "Effect": "Allow",
+                "Resource": [
+                    "/smartcity/camera/people_count/usa/ohio/kitchen_x/city_ai"
+                ]
+            },
+            {
+                "Name": "Allow Fire detection AI to publish the fire alert",
+                "Action": ["publish"],
+                "Effect": "Allow",
+                "Resource": [
+                    "/smartcity/camera/fire_detected/usa/ohio/kitchen_x/city_ai"
+                ]
+            },
+            {
+                "Name": "Allow PUT request to http://httpbin.org/put",
+                "Effect": "Allow",
+                "Action": ["PUT"],
+                "Resource": ["http://httpbin.org/put"],
+                "Condition": {
+                    "AnyOf": [
+                        {
+                            "object": "people_count",
+                            "location": "store_x",
+                            "max_5mins": {
+                                "gt": 10
+                            }
+                        }
+                    ],
+                    "All": [
+                        {
+                            "object": "data_amount",
+                            "protocol": "mqtt",
+                            "lasthour_mb": {
+                                "lt": 3000
+                            }
+                        },
+                        {
+                            "object": "data_amount",
+                            "protocol": "mqtt",
+                            "last24hour_mb": {
+                                "lt": 30000
+                            }
+                        }
+                    ]
+                }
             }
         ]
     },
@@ -82,6 +141,39 @@
                             "location": "store_x",
                             "max_5mins": {
                                 "gt": 15
+                            }
+                        }
+                    ],
+                    "All": [
+                        {
+                            "object": "data_amount",
+                            "protocol": "mqtt",
+                            "lasthour_mb": {
+                                "lt": 3000
+                            }
+                        },
+                        {
+                            "object": "data_amount",
+                            "protocol": "mqtt",
+                            "last24hour_mb": {
+                                "lt": 30000
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "Name": "Allow PUT request to http://httpbin.org/put",
+                "Effect": "Allow",
+                "Action": ["PUT"],
+                "Resource": ["http://httpbin.org/put"],
+                "Condition": {
+                    "AnyOf": [
+                        {
+                            "object": "fire_detected",
+                            "location": "kitchen_x",
+                            "max_5mins": {
+                                "gt": 0
                             }
                         }
                     ],

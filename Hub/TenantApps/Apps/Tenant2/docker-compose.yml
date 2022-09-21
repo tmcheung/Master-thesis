@@ -1,34 +1,37 @@
 version: "3.5"
 services:
-    person_count:
+    person_count_kitchen:
+        build:
+            context: ./PersonCountKitchen
+        networks:
+            - edgehub_public
+            - edgehub_tenant_apps
+            - proxy_network
+
+    person_count_city:
         build:
             context: ./PersonCount
         networks:
+            - edgehub_public
             - edgehub_tenant_apps
             - proxy_network
+
+    fire_detector:
+        build:
+            context: ./FireDetector
+        networks:
             - edgehub_public
-        deploy: 
-            resources:
-                limits:
-                    cpus: '0.50'
-                    memory: 50M
-                reservations:
-                    cpus: '0.25'
-                    memory: 20M
+            - edgehub_tenant_apps
+            - proxy_network
+
     http_test:
         build:
             context: ./HttpTest
         networks:
+            - edgehub_public
             - edgehub_tenant_apps
             - proxy_network
-        deploy: 
-            resources:
-                limits:
-                    cpus: '0.50'
-                    memory: 50M
-                reservations:
-                    cpus: '0.25'
-                    memory: 20M
+
 
 networks:
     edgehub_tenant_apps:

@@ -43,51 +43,55 @@ async function subscribe_contexts() {
 }
 
 function fetch_db() {
-    MongoClient.connect(MONGO_URL, function (err, db) {
-        if (err) throw err;
-        var dbo = db.db(MONGO_DBNAME);
+    MongoClient.connect(
+        MONGO_URL,
+        { useUnifiedTopology: true },
+        function (err, db) {
+            if (err) throw err;
+            var dbo = db.db(MONGO_DBNAME);
 
-        dbo.collection("policies")
-            .find({})
-            .toArray(function (err, result) {
-                if (err) throw err;
-                result.forEach((element) => {
-                    tenant_id = element["tenant_name"];
-                    policies = element["policies"];
+            dbo.collection("policies")
+                .find({})
+                .toArray(function (err, result) {
+                    if (err) throw err;
+                    result.forEach((element) => {
+                        tenant_id = element["tenant_name"];
+                        policies = element["policies"];
 
-                    tenant_context[tenant_id] = [];
+                        tenant_context[tenant_id] = [];
 
-                    for (let i = 0; i < policies.length; i++) {
-                        tenant_context[tenant_id].push({
-                            Condition: policies[i]["Condition"],
-                        });
-                    }
+                        for (let i = 0; i < policies.length; i++) {
+                            tenant_context[tenant_id].push({
+                                Condition: policies[i]["Condition"],
+                            });
+                        }
+                    });
                 });
-            });
 
-        // changeStream = dbo.collection("policies").watch();
+            // changeStream = dbo.collection("policies").watch();
 
-        // changeStream.on("change",function(change){
-        //   documentKey = change['documentKey']['_id'];
+            // changeStream.on("change",function(change){
+            //   documentKey = change['documentKey']['_id'];
 
-        //   dbo.collection("policies").findOne({"_id": new ObjectId(documentKey)}, function(err, doc) {
-        //     if(doc!=undefined){
+            //   dbo.collection("policies").findOne({"_id": new ObjectId(documentKey)}, function(err, doc) {
+            //     if(doc!=undefined){
 
-        //       tenant_id = doc['tenant_name']
-        //       policies = doc['policies']
-        //       tenant_context[tenant_id] = []
+            //       tenant_id = doc['tenant_name']
+            //       policies = doc['policies']
+            //       tenant_context[tenant_id] = []
 
-        //       for(let i=0;i<policies.length;i++){
+            //       for(let i=0;i<policies.length;i++){
 
-        //         tenant_context[tenant_id].push({
-        //           "Condition":  policies[i]['Condition'],
-        //           'last_validated': false
-        //         })
-        //       }
-        //     }
-        //   });
-        // });
-    });
+            //         tenant_context[tenant_id].push({
+            //           "Condition":  policies[i]['Condition'],
+            //           'last_validated': false
+            //         })
+            //       }
+            //     }
+            //   });
+            // });
+        }
+    );
 }
 
 function process_context_data(updated_data) {
@@ -136,6 +140,40 @@ function peopleCountEvaluationChanged(
     const evaluation_status = evaluate_value(
         condition_detail,
         context_data["people_count"][condition_detail["location"]]
+    );
+    const previous_evaluation_status =
+        tenant_context[tenant_id][condition_idx]["Condition"][group_idx][
+            att_idx
+        ]["evaluation_status"];
+    //Set to the value
+
+    tenant_context[tenant_id][condition_idx]["Condition"][group_idx][att_idx][
+        "evaluation_status"
+    ] = evaluation_status;
+
+    return previous_evaluation_status != evaluation_status;
+}
+
+function fireDetectedEvaluationChanged(
+    tenant_context_data,
+    tenant_context,
+    tenant_id,
+    condition_detail,
+    context_data,
+    att_idx,
+    group_idx,
+    condition_idx
+) {
+    if (!tenant_context_data["fire_detected"]) {
+        tenant_context_data["fire_detected"] = {};
+    }
+    tenant_context_data["fire_detected"][condition_detail["location"]] =
+        context_data["fire_detected"][condition_detail["location"]];
+
+    //Evaluate if we should push
+    const evaluation_status = evaluate_value(
+        condition_detail,
+        context_data["fire_detected"][condition_detail["location"]]
     );
     const previous_evaluation_status =
         tenant_context[tenant_id][condition_idx]["Condition"][group_idx][
@@ -251,6 +289,30 @@ function evaluate_tenant_context(tenant_id) {
                             condition_detail["location"]
                         ] = 0;
                     }
+                } else if (condition_detail_key === "fire_detected") {
+                    try {
+                        if (
+                            fireDetectedEvaluationChanged(
+                                tenant_context_data,
+                                tenant_context,
+                                tenant_id,
+                                condition_detail,
+                                context_data,
+                                predicate_idx,
+                                group_idx,
+                                policy_idx
+                            )
+                        ) {
+                            push_context = true;
+                        }
+                    } catch (e) {
+                        console.error(
+                            `Error when evaluating people count change: ${e}`
+                        );
+                        tenant_context_data["fire_detected"][
+                            condition_detail["location"]
+                        ] = 0;
+                    }
                 } else if (condition_detail_key === "data_amount") {
                     try {
                         if (
@@ -349,6 +411,7 @@ function publish_tenant_context(tenant_id, tenant_context_conditions) {
                     function (att_idx) {
                         const condition_detail =
                             condition["Condition"][group_idx][att_idx];
+
                         if (condition_detail["object"] == "people_count") {
                             if (
                                 tenant_context_data["people_count"] == undefined
@@ -364,6 +427,27 @@ function publish_tenant_context(tenant_id, tenant_context_conditions) {
                                     ];
                             } catch (e) {
                                 tenant_context_data["people_count"][
+                                    condition_detail["location"]
+                                ] = 0;
+                            }
+                        }
+
+                        if (condition_detail["object"] == "fire_detected") {
+                            if (
+                                tenant_context_data["fire_detected"] ==
+                                undefined
+                            ) {
+                                tenant_context_data["fire_detected"] = {};
+                            }
+                            try {
+                                tenant_context_data["fire_detected"][
+                                    condition_detail["location"]
+                                ] =
+                                    context_data["fire_detected"][
+                                        condition_detail["location"]
+                                    ];
+                            } catch (e) {
+                                tenant_context_data["fire_detected"][
                                     condition_detail["location"]
                                 ] = 0;
                             }

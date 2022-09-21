@@ -46,7 +46,7 @@ def connect_mqtt():
         client.connect("virtual-mqtt", 1883)
         config.mqtt_client = client
     except Exception as e:
-        print(e)
+        # print(e)
         pass
 
 
@@ -54,7 +54,6 @@ connect_mqtt()
 while True:
     time.sleep(1)
     print("requesting video feed")
-
     try:
         video = cv2.VideoCapture('rtmp://streaming-service/live/smartcity.camera.stream.usa.ohio.store_x.city_surveillance?username=tenant-2&password=123456')
         count = 0
@@ -70,7 +69,7 @@ while True:
 
             try:
 
-                frame,people_count = analyze_video(frame=frame)
+                frame,people_count = analyze_video(frame=frame)           
                 publish_people_count(people_count=people_count)
             except:
                 pass
