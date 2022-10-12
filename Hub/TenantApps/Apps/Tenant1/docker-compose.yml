@@ -1,0 +1,17 @@
+version: "3.5"
+services:
+    fire_detector_kitchen:
+        build:
+            context: ./FireDetectorKitchen
+        networks:
+            - edgehub_public
+            - edgehub_tenant_apps
+            - proxy_network
+
+networks:
+    edgehub_tenant_apps:
+        external: true
+    proxy_network:
+        external: true
+    edgehub_public:
+        external: true

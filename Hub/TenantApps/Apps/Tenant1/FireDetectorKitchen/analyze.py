@@ -25,8 +25,8 @@ def connect_mqtt():
 
     try:
         print("Connecting")
-        client = mqtt_client.Client(client_id="12")
-        client.username_pw_set("tenant-2", "123456")
+        client = mqtt_client.Client(client_id="111111")
+        client.username_pw_set("tenant-1", "123456")
         client.on_connect = on_connect
         client.connect("virtual-mqtt", 1883)
         config.mqtt_client = client
@@ -41,7 +41,7 @@ while True:
     print("requesting video feed")
 
     try:
-        video = cv2.VideoCapture('rtmp://streaming-service/live/smartcity.camera.stream.usa.ohio.kitchen_x.city_surveillance?username=tenant-2&password=123456')
+        video = cv2.VideoCapture('rtmp://streaming-service/live/smartcity.camera.stream.usa.ohio.kitchen_x.city_surveillance?username=tenant-1&password=123456')
         while video.isOpened():
             print("video open")
             time.sleep(20)

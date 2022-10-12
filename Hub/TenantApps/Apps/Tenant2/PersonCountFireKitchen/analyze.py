@@ -2,6 +2,8 @@ import cv2
 from paho.mqtt import client as mqtt_client
 import config
 import time
+import requests
+
 
 HOGCV = cv2.HOGDescriptor()
 HOGCV.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
@@ -19,12 +21,33 @@ def analyze_video(frame):
 
     return frame,people_count
 
-def publish_people_count(people_count):
+def publish_people_count_mqtt(people_count):
     try:
         topic='/smartcity/camera/people_count/usa/ohio/kitchen_x/city_ai'
         msg=people_count        
         result = config.mqtt_client.publish(topic, msg)
         print("publish result:", result)
+    except Exception as e:
+        print(e)
+        pass
+
+def send_people_count_http(people_count):
+    try:
+        proxies = {
+            'http': 'http://forward_proxy:80',
+            'https': 'http://forward_proxy:443',
+        }
+        headers = {
+            'Proxy-Authorization': 'tenant-2:123456',
+            'Proxy-Authenticate': 'Basic'
+        }
+        r = requests.put(
+            'http://localhost3009/people_count',
+            data={people_count},
+            proxies=proxies,
+            headers=headers,
+        )
+        print("http response:", r.status_code)
     except Exception as e:
         print(e)
         pass
@@ -57,6 +80,7 @@ while True:
     try:
         video = cv2.VideoCapture('rtmp://streaming-service/live/smartcity.camera.stream.usa.ohio.kitchen_x.city_surveillance?username=tenant-2&password=123456')
         count = 0
+        http_count = 0
         while video.isOpened():
             count = count +1
             check, frame =  video.read()
@@ -70,7 +94,11 @@ while True:
                 if(people_count == 1):
                     people_count = 0
                 print("people:", people_count)
-                publish_people_count(people_count=people_count)
+                publish_people_count_mqtt(people_count=people_count)
+                
+                if http_count%30:
+                    send_people_count_http(people_count=people_count)
+                http_count += 1
             except:
                 pass
 

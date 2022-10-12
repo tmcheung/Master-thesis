@@ -1,8 +1,8 @@
 version: "3.5"
 services:
-    person_count_kitchen:
+    person_count_fire_kitchen:
         build:
-            context: ./PersonCountKitchen
+            context: ./PersonCountFireKitchen
         networks:
             - edgehub_public
             - edgehub_tenant_apps
@@ -10,27 +10,19 @@ services:
 
     person_count_city:
         build:
-            context: ./PersonCount
+            context: ./PersonCountCity
         networks:
             - edgehub_public
             - edgehub_tenant_apps
             - proxy_network
 
-    fire_detector:
-        build:
-            context: ./FireDetector
-        networks:
-            - edgehub_public
-            - edgehub_tenant_apps
-            - proxy_network
-
-    http_test:
-        build:
-            context: ./HttpTest
-        networks:
-            - edgehub_public
-            - edgehub_tenant_apps
-            - proxy_network
+    # http_test:
+    #     build:
+    #         context: ./HttpTest
+    #     networks:
+    #         - edgehub_public
+    #         - edgehub_tenant_apps
+    #         - proxy_network
 
 
 networks:

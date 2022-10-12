@@ -8,9 +8,11 @@ services:
 
     tenant_2:
         build:
-            context: ./Tenant2-AI/AnalyzeVideo
-        networks:
-            - edgehub_public
+            context: ./Tenant2/FireAlertServer
+        expose:
+            - "3000"
+        ports:
+            - "3009:3000"
 
     tenant_web:
         build:
@@ -19,6 +21,8 @@ services:
             - "30000:3000"
         networks:
             - edgehub_public
+    
+
 
 networks:
     edgehub_public:

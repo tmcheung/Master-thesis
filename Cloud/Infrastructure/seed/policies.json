@@ -20,6 +20,22 @@
                 "Resource": [
                     "/smartcity/camera/stream/usa/ohio/kitchen_x/city_surveillance"
                 ]
+            },
+            {
+                "Name": "Allow Fire detection AI to publish the fire alert",
+                "Action": ["publish"],
+                "Effect": "Allow",
+                "Resource": [
+                    "/smartcity/camera/fire_detected/usa/ohio/kitchen_x/city_ai"
+                ]
+            },
+            {
+                "Name": "Allow Kitchen AI to subscribe the Video",
+                "Effect": "Allow",
+                "Action": ["subscribe"],
+                "Resource": [
+                    "/smartcity/camera/stream/usa/ohio/kitchen_x/city_surveillance"
+                ]
             }
         ]
     },
@@ -71,25 +87,17 @@
                 ]
             },
             {
-                "Name": "Allow Fire detection AI to publish the fire alert",
-                "Action": ["publish"],
-                "Effect": "Allow",
-                "Resource": [
-                    "/smartcity/camera/fire_detected/usa/ohio/kitchen_x/city_ai"
-                ]
-            },
-            {
-                "Name": "Allow PUT request to http://httpbin.org/put",
+                "Name": "Allow PUT request to http://localhost:3009/people_count",
                 "Effect": "Allow",
                 "Action": ["PUT"],
-                "Resource": ["http://httpbin.org/put"],
+                "Resource": ["http://localhost:3009/people_count"],
                 "Condition": {
                     "AnyOf": [
                         {
-                            "object": "people_count",
-                            "location": "store_x",
+                            "object": "fire_detected",
+                            "location": "kitchen_x",
                             "max_5mins": {
-                                "gt": 10
+                                "eq": 1
                             }
                         }
                     ],
