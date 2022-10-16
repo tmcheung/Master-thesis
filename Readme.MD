@@ -163,12 +163,14 @@ Start off with running the system as described above.
 
 ### Fire alert
 1. Start application for vizualization of the results
+2. Ensure that hardcoded IP address in `Cloud/Infrastructure/seed/policies.json` and `Hub/TenantApps/Apps/Tenant2/PersonCountFireKitchen/analyze.py` refers to private IP of your host machine (often `192.168.1.156`, but not necessarily)
+This IP address is used to loopback to host from docker container (when host network is not used) when running upstream application on localhost.
 
 ```
 ./Tenants/startup_fire_alert_server.sh
 ```
 
-2. Start Publisher
+1. Start Publisher
 
 ```
 ./Tenants/startup_publisher_kitchen.sh
