@@ -73,47 +73,52 @@ In this research, we have implemented two applications using MQTT protocol and R
 │   |   |   -   Dockerfile
 │   |   |   -   *.js files
 │   └───Streaming-Auth
-│       |───ContextSensing
-│       |   -   Dockerfile
-│       |   -   *.js files
-│       Streaming-Service
-│       |───ContextSensing
-│       |   -   Dockerfile
-│       |   -   *.js files
-│       VirtualMQTT
-│       |───ContextSensing
-│       |   -   Dockerfile
-│       |   -   *.js files
+│   |   |───ContextSensing
+│   |   |   -   Dockerfile
+│   |   |   -   *.js files
+│   |   Streaming-Service
+│   |   |───ContextSensing
+│   |   |   -   Dockerfile
+│   |   |   -   *.js files
+│   |   VirtualMQTT
+│   |   |───ContextSensing
+│   |   |   -   Dockerfile
+│   |   |   -   *.js files
+│   └───TenantApps
+│       |───Apps
+│       |   |───Tenant1
+│       |   |   |───FireDetectorKitchen
+│       |   |───Tenant2
+│       |   |   |───PersonCountCity
+│       |   |   |───PersonCountFireKitchen
+│       |───forward_proxy
+|
+|
 └───Tenants
 │   | -   docker-compose.yml
-│   | -   startup_ai.sh
-│   | -   startup_publisher.sh
+│   | -   startup_publisher_city.sh
+│   | -   startup_publisher_kitchen.sh
 │   | -   startup_web.sh
-│   └───Tenant-1: Video Publisher
-│       |───ContextSensing
-│       |   -   Dockerfile
-│       |   -   *.js files
-│       Tenant-2: AI
-│       |───ContextSensing
-│       |   -   Dockerfile
-│       |   -   *.js files
+│   | -   startup_fire_alert_server.sh
+│   └───Tenant-1:
+│       |───Surveillance-Camera-City
+│       |───Surveillance-Camera-Kitchen
+│       Tenant-2:
+│       |───FireAlertServer
 │       Tenant-Web
-│       |───ContextSensing
-│       |   -   Dockerfile
-│       |   -   *.js files
 
 ```
 
 ## Sample Data
 
-The sample data is in the folder: Cloud-Mongo\datahub.
-To import the data, use MongoCompass to import the data to the following collections:
+The sample data is in the folder: `Cloud/Infrastructure/seed`.
+-   `tenants.json`
+-   `policies.json`
+-   `contexts.json`
 
--   tenants
--   policies
--   contexts
 
-## Steps to run the system
+
+# Steps to run the system
 
 Prerequisite: You must install docker and docker-compose on your computer
 
@@ -135,21 +140,36 @@ Prerequisite: You must install docker and docker-compose on your computer
 ./Cloud/ManagerApps/startup.sh
 ```
 
-4. Start Hub Services
+4. Start Hub Services and tenant applications
 
 ```
 ./Hub/startup.sh
 ```
 
-5. Start Tenant Subscribers
 
+## Running the scenarios with tenant apps
+Start off with running the system as described above.
+
+### People count
+1. Start application for vizualization of the results
 ```
 ./Tenants/startup_web.sh
-./Tenants/startup_people_count.sh
 ```
-
-6. Start Publishers
+2. Start Publisher
 
 ```
-./Tenants/startup_publisher.sh
+./Tenants/startup_publisher_city.sh
+```
+
+### Fire alert
+1. Start application for vizualization of the results
+
+```
+./Tenants/startup_fire_alert_server.sh
+```
+
+2. Start Publisher
+
+```
+./Tenants/startup_publisher_kitchen.sh
 ```

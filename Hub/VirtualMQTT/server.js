@@ -35,6 +35,8 @@ function removeTopicWildcard(topic) {
 }
 
 aedes.authenticate = function (client, username, password, callback) {
+    console.log(`${username}, ${password}`);
+
     if (username == undefined || password == undefined) {
         callback(null, true);
         return;
@@ -75,6 +77,7 @@ aedes.authorizePublish = function (client, packet, callback) {
     const user = client.username;
     const topic = packet.topic;
     const action = `publish`;
+    console.log(`${user}, ${topic}, ${action}`);
 
     if (!authorizationExpired(client, topic, action, 10000)) {
         data_amount[user] = data_amount[user] + sizeof.sizeof(packet);
@@ -153,6 +156,14 @@ aedes.authorizeForward = function (client, packet) {
     }
 };
 
+aedes.on("clientError", function (client, err) {
+    console.log("client error", client.id, err.message, err.stack);
+});
+
+aedes.on("connectionError", function (client, err) {
+    console.log("connection error", client, err.message, err.stack);
+});
+
 server.listen(port, function () {
     console.log("server started and listening on port ", port);
 });
@@ -161,23 +172,23 @@ httpServer.listen(http_port, function () {
     console.log("websocket server listening on port ", http_port);
 });
 
-setInterval(() => {
-    for (const [tenant_id, value] of Object.entries(data_amount)) {
-        const topic = `${DATA_AMOUNT_TOPIC}/${tenant_id}`;
+// setInterval(() => {
+//     for (const [tenant_id, value] of Object.entries(data_amount)) {
+//         const topic = `${DATA_AMOUNT_TOPIC}/${tenant_id}`;
 
-        console.log(
-            `Publishing: ${data_amount[tenant_id]}, on topic: ${topic}`
-        );
+//         console.log(
+//             `Publishing: ${data_amount[tenant_id]}, on topic: ${topic}`
+//         );
 
-        aedes.publish({
-            cmd: "publish",
-            qos: 2,
-            topic: topic,
-            payload: Buffer.from(`${data_amount[tenant_id]}`),
-            retain: false,
-        });
-        mqtt_client.publish(topic, `${data_amount[tenant_id]}`);
+//         aedes.publish({
+//             cmd: "publish",
+//             qos: 2,
+//             topic: topic,
+//             payload: Buffer.from(`${data_amount[tenant_id]}`),
+//             retain: false,
+//         });
+//         mqtt_client.publish(topic, `${data_amount[tenant_id]}`);
 
-        data_amount[tenant_id] = 0;
-    }
-}, 6000);
+//         data_amount[tenant_id] = 0;
+//     }
+// }, 6000);

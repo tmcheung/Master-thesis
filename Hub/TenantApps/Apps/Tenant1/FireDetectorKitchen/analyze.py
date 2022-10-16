@@ -3,16 +3,14 @@ from paho.mqtt import client as mqtt_client
 import config
 import time
 
-HOGCV = cv2.HOGDescriptor()
-HOGCV.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
-
 def publish_fire_alert():
     try:
         topic='/smartcity/camera/fire_detected/usa/ohio/kitchen_x/city_ai'
         msg=1        
         result = config.mqtt_client.publish(topic, msg)
+        print("publish result:",result)
     except Exception as e:
-        print(e)
+        print("publish error:",e)
         pass
 
 
@@ -31,7 +29,7 @@ def connect_mqtt():
         client.connect("virtual-mqtt", 1883)
         config.mqtt_client = client
     except Exception as e:
-        print(e)
+        print("connection error:",e)
         pass
 
 
@@ -44,7 +42,7 @@ while True:
         video = cv2.VideoCapture('rtmp://streaming-service/live/smartcity.camera.stream.usa.ohio.kitchen_x.city_surveillance?username=tenant-1&password=123456')
         while video.isOpened():
             print("video open")
-            time.sleep(20)
+            # time.sleep(15)
             for i in range(100):
                 try:
                     print("publishing fire alert")

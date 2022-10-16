@@ -26,8 +26,9 @@ def publish_people_count(people_count):
         topic='/smartcity/camera/people_count/usa/ohio/store_x/city_ai'
         msg=people_count        
         result = config.mqtt_client.publish(topic, msg)
+        print("publish result:",result)
     except Exception as e:
-        print(e)
+        print("publish error:",e)
         pass
 
 
@@ -46,7 +47,7 @@ def connect_mqtt():
         client.connect("virtual-mqtt", 1883)
         config.mqtt_client = client
     except Exception as e:
-        # print(e)
+        print("connection error", e)
         pass
 
 

@@ -6,13 +6,15 @@ services:
     #   networks:
     #     - default
 
-    tenant_2:
+    fire_alert_server:
         build:
             context: ./Tenant2/FireAlertServer
         expose:
             - "3000"
         ports:
             - "3009:3000"
+        networks:
+            - cloud
 
     tenant_web:
         build:
@@ -26,4 +28,6 @@ services:
 
 networks:
     edgehub_public:
+        external: true
+    cloud:
         external: true

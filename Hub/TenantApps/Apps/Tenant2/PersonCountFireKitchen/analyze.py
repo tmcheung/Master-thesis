@@ -34,22 +34,29 @@ def publish_people_count_mqtt(people_count):
 def send_people_count_http(people_count):
     try:
         proxies = {
-            'http': 'http://forward_proxy:80',
-            'https': 'http://forward_proxy:443',
+            'http': 'http://forward_proxy:80/local',
+            'https': 'http://forward_proxy:443/local',
         }
+        # proxies = {
+        #     'http': 'http://forward_proxy:80',
+        #     'https': 'http://forward_proxy:443',
+        # }
+
         headers = {
             'Proxy-Authorization': 'tenant-2:123456',
-            'Proxy-Authenticate': 'Basic'
+            'Proxy-Authenticate': 'Basic',
+            'Content-Type': 'application/json',
         }
         r = requests.put(
-            'http://localhost3009/people_count',
-            data={people_count},
+            'http://192.168.1.156:3009/people_count',
+            json={'msg': f'kitchen_x people count: ${str(people_count)}'},
             proxies=proxies,
             headers=headers,
         )
         print("http response:", r.status_code)
+        print("http response:", r, str(r))
     except Exception as e:
-        print(e)
+        print("http results:",e)
         pass
 
 
@@ -76,7 +83,7 @@ connect_mqtt()
 while True:
     time.sleep(1)
     print("requesting video feed")
-
+    
     try:
         video = cv2.VideoCapture('rtmp://streaming-service/live/smartcity.camera.stream.usa.ohio.kitchen_x.city_surveillance?username=tenant-2&password=123456')
         count = 0

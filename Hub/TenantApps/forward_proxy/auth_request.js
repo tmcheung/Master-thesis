@@ -3,7 +3,10 @@ const authorizeRequest = async (r) => {
     const method = getMethod(r);
     const url = getUrl(r);
     r.error(JSON.stringify(r));
-    r.error(`${credentials.username}, ${credentials.password}`);
+    r.error(`credentials: ${credentials.username}, ${credentials.password}`);
+    r.error(
+        `username: ${credentials.username}, url: ${url}, method: ${method}`
+    );
 
     if (
         !credentials ||
@@ -45,11 +48,11 @@ const authorized = async (r, username, method, url) => {
 };
 
 const getMethod = (r) => r.variables.request_method;
-const getUrl = (r) =>
-    r.variables.scheme +
-    "://" +
-    r.variables.host +
-    r.variables.request_uri.split("?")[0];
+const getUrl = (r) => {
+    const baseUrl = `${r.variables.scheme}://${r.variables.http_host}`;
+    const path = r.variables.request_uri.split("?")[0];
+    return `${baseUrl}${path}`;
+};
 
 const getBasicAuthCredentials = (r) => {
     if (

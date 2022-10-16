@@ -100,20 +100,21 @@
                                 "eq": 1
                             }
                         }
-                    ],
-                    "All": [
+                    ]
+                }
+            },
+            {
+                "Name": "Allow PUT request to http://localhost:3009/people_count from inside docker container",
+                "Effect": "Allow",
+                "Action": ["PUT"],
+                "Resource": ["http://192.168.1.156:3009/people_count"],
+                "Condition": {
+                    "AnyOf": [
                         {
-                            "object": "data_amount",
-                            "protocol": "mqtt",
-                            "lasthour_mb": {
-                                "lt": 3000
-                            }
-                        },
-                        {
-                            "object": "data_amount",
-                            "protocol": "mqtt",
-                            "last24hour_mb": {
-                                "lt": 30000
+                            "object": "fire_detected",
+                            "location": "kitchen_x",
+                            "max_5mins": {
+                                "eq": 1
                             }
                         }
                     ]
@@ -151,22 +152,6 @@
                                 "gt": 15
                             }
                         }
-                    ],
-                    "All": [
-                        {
-                            "object": "data_amount",
-                            "protocol": "mqtt",
-                            "lasthour_mb": {
-                                "lt": 3000
-                            }
-                        },
-                        {
-                            "object": "data_amount",
-                            "protocol": "mqtt",
-                            "last24hour_mb": {
-                                "lt": 30000
-                            }
-                        }
                     ]
                 }
             },
@@ -182,22 +167,6 @@
                             "location": "kitchen_x",
                             "max_5mins": {
                                 "gt": 0
-                            }
-                        }
-                    ],
-                    "All": [
-                        {
-                            "object": "data_amount",
-                            "protocol": "mqtt",
-                            "lasthour_mb": {
-                                "lt": 3000
-                            }
-                        },
-                        {
-                            "object": "data_amount",
-                            "protocol": "mqtt",
-                            "last24hour_mb": {
-                                "lt": 30000
                             }
                         }
                     ]
@@ -233,22 +202,6 @@
                             "location": "store_x",
                             "max_5mins": {
                                 "gt": 30
-                            }
-                        }
-                    ],
-                    "All": [
-                        {
-                            "object": "data_amount",
-                            "protocol": "mqtt",
-                            "lasthour_mb": {
-                                "lt": 3000
-                            }
-                        },
-                        {
-                            "object": "data_amount",
-                            "protocol": "mqtt",
-                            "last24hour_mb": {
-                                "lt": 30000
                             }
                         }
                     ]
