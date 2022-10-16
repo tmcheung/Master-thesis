@@ -155,8 +155,10 @@ Start off with running the system as described above.
 ```
 ./Tenants/startup_web.sh
 ```
-2. Start Publisher
 
+2. Go to http://localhost:30000/home
+
+3. Start Publisher
 ```
 ./Tenants/startup_publisher_city.sh
 ```
@@ -170,7 +172,9 @@ This IP address is used to loopback to host from docker container (when host net
 ./Tenants/startup_fire_alert_server.sh
 ```
 
-1. Start Publisher
+2. Go to http://192.168.1.156:3009
+
+3. Start Publisher
 
 ```
 ./Tenants/startup_publisher_kitchen.sh
