@@ -49,7 +49,7 @@ def send_people_count_http(people_count):
         }
         r = requests.put(
             'http://192.168.1.156:3009/people_count',
-            json={'msg': f'kitchen_x people count: ${str(people_count)}'},
+            json={'msg': f'kitchen_x people count: {str(people_count)}'},
             proxies=proxies,
             headers=headers,
         )
