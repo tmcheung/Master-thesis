@@ -181,6 +181,9 @@ This IP address is used to loopback to host from docker container (when host net
 ```
 
 
-# Issues
-The system is not stable and might overload docker, especially when video feed is streamed.
+# Known issues
+1. The system might overload docker, especially when video feed is streamed.
+We advice to either restart the whole system, or quit the publisher and restart the edge hub after demoing a scenario.
+
+2. The system is not stable and will sometimes have issues with communication between tenant applications and the Virtual MQTT. The result is that data sent to the MQTT will not be received, which causes the Context-Sensing service to not process any contexts.
 We advice to either restart the whole system, or quit the publisher and restart the edge hub after demoing a scenario.
