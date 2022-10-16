@@ -179,3 +179,8 @@ This IP address is used to loopback to host from docker container (when host net
 ```
 ./Tenants/startup_publisher_kitchen.sh
 ```
+
+
+# Issues
+The system is not stable and might overload docker, especially when video feed is streamed.
+We advice to either restart the whole system, or quit the publisher and restart the edge hub after demoing a scenario.
