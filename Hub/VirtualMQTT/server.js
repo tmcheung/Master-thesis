@@ -18,6 +18,8 @@ const server = createServer(aedes);
 
 const fetch = require("node-fetch");
 
+const SKIP_AUTH = process.env.SKIP_AUTH || false;
+
 const AUTHENTICATION_HOST = process.env.AUTHENTICATION_HOST;
 const AUTHENTICATION_URL = urljoin(AUTHENTICATION_HOST, "/login");
 const { authorize, authorizationExpired } = require("./auth");
@@ -35,6 +37,11 @@ function removeTopicWildcard(topic) {
 }
 
 aedes.authenticate = function (client, username, password, callback) {
+    if (SKIP_AUTH) {
+        callback(null, true);
+        return;
+    }
+
     console.log(`${username}, ${password}`);
 
     if (username == undefined || password == undefined) {
@@ -74,6 +81,11 @@ aedes.authenticate = function (client, username, password, callback) {
 };
 
 aedes.authorizePublish = function (client, packet, callback) {
+    if (SKIP_AUTH) {
+        callback(null);
+        return;
+    }
+
     const user = client.username;
     const topic = packet.topic;
     const action = `publish`;
@@ -103,6 +115,11 @@ aedes.authorizePublish = function (client, packet, callback) {
 };
 
 aedes.authorizeSubscribe = function (client, sub, callback) {
+    if (SKIP_AUTH) {
+        callback(null, sub);
+        return;
+    }
+
     const topic = removeTopicWildcard(sub.topic);
     const action = `subscribe`;
 
@@ -132,6 +149,10 @@ aedes.authorizeSubscribe = function (client, sub, callback) {
 };
 
 aedes.authorizeForward = function (client, packet) {
+    if (SKIP_AUTH) {
+        return packet;
+    }
+
     const username = client.username;
     const topic = removeTopicWildcard(packet.topic);
     const action = `subscribe`;

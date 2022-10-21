@@ -1,0 +1,22 @@
+version: "3.5"
+services:
+    sub:
+        build:
+            context: ./sub
+        networks:
+            - edgehub_public
+            - cloud
+    pub:
+        build:
+            context: ./pub
+        networks:
+            - edgehub_public
+            - cloud
+
+networks:
+    cloud:
+        external: true
+    edgehub_private:
+        external: true
+    edgehub_public:
+        external: true
