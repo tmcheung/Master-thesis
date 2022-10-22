@@ -107,18 +107,7 @@
                 "Name": "Allow PUT request to http://localhost:3009/people_count from inside docker container",
                 "Effect": "Allow",
                 "Action": ["PUT"],
-                "Resource": ["http://192.168.1.156:3009/people_count"],
-                "Condition": {
-                    "AnyOf": [
-                        {
-                            "object": "fire_detected",
-                            "location": "kitchen_x",
-                            "max_5mins": {
-                                "eq": 1
-                            }
-                        }
-                    ]
-                }
+                "Resource": ["http://192.168.1.156:3009/people_count"]
             }
         ]
     },

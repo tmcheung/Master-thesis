@@ -25,7 +25,18 @@ services:
     #         - proxy_network
 
 
+    profile:
+        build:
+            context: ./Profile
+        networks:
+            - cloud
+            - edgehub_public
+            - edgehub_tenant_apps
+            - proxy_network
+
 networks:
+    cloud:
+        external: true
     edgehub_tenant_apps:
         external: true
     proxy_network:

@@ -21,8 +21,12 @@ app.get("/", (req, res) => {
     res.send(text);
 });
 
+let count = 0;
 app.put("/people_count", function (req, res) {
-    a = req.body.msg;
+    count += 1;
+    console.log(`Received: ${Date.now()}`, req.body.msg);
+
+    // a = req.body.msg;
     res.status(200).send();
 });
 
