@@ -56,8 +56,7 @@ function update_policy(tenant_id, opa_policy) {
 }
 
 function update_context_data(tenant_id, opa_data) {
-    start_time = new Date().getTime();
-
+    console.log(`data: ${opa_data}`);
     const OPA_HOST = `opa_${tenant_id}`;
 
     const options = {
@@ -85,20 +84,16 @@ function update_context_data(tenant_id, opa_data) {
     req.write(opa_data);
     req.end();
 
-    end_time = new Date().getTime();
-
-    duration = end_time - start_time;
-    console.log(
-        `[Profile]Update Context Data for ${tenant_id}, Duration: ${duration}`
-    );
+    const ts = Date.now();
+    console.log(`[Profile]Update Context Data for ${tenant_id},TS: ${ts}`);
 }
 
 consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
-        if (DEBUG) {
-            console.log("----------------------------------------------------");
-            console.log(topic);
-        }
+        // if (DEBUG) {
+        //     console.log("----------------------------------------------------");
+        //     console.log(topic);
+        // }
 
         message_parsed = JSON.parse(message.value.toString());
         if (!message_parsed["tenant_id"]) {
@@ -107,20 +102,15 @@ consumer.run({
 
         if (topic.startsWith(TENANT_POLICY_TOPIC)) {
             const ts = Date.now();
-            console.log(
-                `[${message_parsed["tenant_id"]}], Policy Updated TS: ${ts}`
-            );
+            // console.log(
+            //     `[${message_parsed["tenant_id"]}], Policy Updated TS: ${ts}`
+            // );
 
             update_policy(
                 message_parsed["tenant_id"],
                 message_parsed["policies"]
             );
         } else if (topic.startsWith(TENANT_CONTEXT_DATA_TOPIC)) {
-            const ts = Date.now();
-            console.log(
-                `[${message_parsed["tenant_id"]}], Context Data Updated TS: ${ts}, Message: ${message_parsed["context_data"]}`
-            );
-
             update_context_data(
                 message_parsed["tenant_id"],
                 message_parsed["context_data"]
