@@ -7,6 +7,8 @@ This project has been implemented by Huu Ha Nguyen and Thomas Man-Gang Cheung wi
 
 ## System Architecture
 
+### Version 1
+
 The platform is proposed to be a multi-regional-hubs system that connects with the Cloud for data exchange. The hubs serve the clients in its region and based on the data collected, it aggregates the corresponding data to become contexts and sends them to the Cloud. The cloud receives that context data to process and sends management commands to the hubs.
 
 ![Alt text](/readme/img/cloud-hubs-architecture.png?raw=true "Multiple region architecture")
@@ -23,13 +25,25 @@ Tenant-specific context data generation
 
 ![Alt text](/readme/img/cloud-hub-architecture.png?raw=true "Cloud-Hub Architecture")
 
-### Data Publishing and Subscribing
+#### Data Publishing and Subscribing
 
 On every hub, multiple hub-specific applications are the data gateways for the clients to connect to. These applications need to connect to the OPA, a tenant-specific application, for authorization for per requests.
 
 ![Alt text](/readme/img/publish-subscribe-architecture.png?raw=true "Cloud-Hub Architecture")
 
-In this research, we have implemented two applications using MQTT protocol and RTMP protocols.
+
+### Version 2
+The second version of this work extends the existing platform with a Edge-Platform-as-a-Service component.
+By enabling deployment of in-hub tenant-applications, we simplify collection of shared data as devices in close proximity is no longer needed.
+The in-hub tenant-applications use the existing hub infrastructure to subscribe to data, following the access control policy rules defined in OPA.
+
+![Alt text](/readme/img/proof-of-concept-PaaS.drawio.png?raw=true "Cloud-Hub-PaaS Architecture")
+
+In addition, we enable the decoupling of access control policies regarding processing rights, and sharing rights.
+The result is privacy preserving capabilities, where an in-hub tenant-application may get access rights to process specific IoT-data to infer values, without exposing the IoT-data to the tenant. This is done using docker networks to restrict the network capabilites of the tenant-applications, forcing them to proxy requests through a nginx forward proxy which authenticates and authorizes in the same manner as the data platform.
+
+![Alt text](/readme/img/forward_proxy_high_level.drawio.png?raw=true "Cloud-Hub-PaaS Architecture")
+
 
 ## Directory Structure
 
