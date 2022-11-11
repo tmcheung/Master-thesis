@@ -15,13 +15,15 @@ client.on("connect", function () {
     );
 });
 
+const amount = 10;
+console.log("amount:", amount);
 let count = 0;
 client.on("message", function (topic, message) {
     // message is Buffer
     // console.log(message.toString())
     count = count + 1;
     // console.log(count);
-    if (count % 1000 == 0) {
+    if (count % amount == 0) {
         const ts = Date.now();
         console.log(`Subscribe the data ends at: ${ts}`);
     }

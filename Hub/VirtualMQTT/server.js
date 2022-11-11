@@ -18,7 +18,7 @@ const server = createServer(aedes);
 
 const fetch = require("node-fetch");
 
-const SKIP_AUTH = process.env.SKIP_AUTH || false;
+const SKIP_AUTH = true;
 
 const AUTHENTICATION_HOST = process.env.AUTHENTICATION_HOST;
 const AUTHENTICATION_URL = urljoin(AUTHENTICATION_HOST, "/login");
